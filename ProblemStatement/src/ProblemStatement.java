@@ -3,74 +3,88 @@ import java.util.*;
 public class ProblemStatement {
 
     // ---------------- LINEAR SEARCH ----------------
-    public static void linearSearch(String[] arr, String target) {
-        int first = -1, last = -1;
+    public static void linearSearch(int[] arr, int target) {
         int comparisons = 0;
+        boolean found = false;
 
         for (int i = 0; i < arr.length; i++) {
             comparisons++;
-
-            if (arr[i].equals(target)) {
-                if (first == -1) first = i;
-                last = i;
+            if (arr[i] == target) {
+                System.out.println("Linear: Found at index " + i);
+                found = true;
+                break;
             }
         }
 
-        System.out.println("Linear Search:");
-        if (first != -1) {
-            System.out.println("First occurrence: " + first);
-            System.out.println("Last occurrence: " + last);
-        } else {
-            System.out.println("Not found");
+        if (!found) {
+            System.out.println("Linear: Not found");
         }
+
         System.out.println("Comparisons: " + comparisons);
     }
 
-    // ---------------- BINARY SEARCH (FIRST) ----------------
-    public static int binaryFirst(String[] arr, String target, Counter counter) {
+    // ---------------- FLOOR ----------------
+    public static int findFloor(int[] arr, int target, Counter counter) {
         int low = 0, high = arr.length - 1;
-        int result = -1;
+        int floor = -1;
 
         while (low <= high) {
             counter.count++;
             int mid = (low + high) / 2;
 
-            if (arr[mid].equals(target)) {
-                result = mid;
-                high = mid - 1; // go left
-            } else if (arr[mid].compareTo(target) < 0) {
+            if (arr[mid] == target) return arr[mid];
+
+            if (arr[mid] < target) {
+                floor = arr[mid]; // possible answer
                 low = mid + 1;
             } else {
                 high = mid - 1;
             }
         }
 
-        return result;
+        return floor;
     }
 
-    // ---------------- BINARY SEARCH (LAST) ----------------
-    public static int binaryLast(String[] arr, String target, Counter counter) {
+    // ---------------- CEILING ----------------
+    public static int findCeiling(int[] arr, int target, Counter counter) {
         int low = 0, high = arr.length - 1;
-        int result = -1;
+        int ceil = -1;
 
         while (low <= high) {
             counter.count++;
             int mid = (low + high) / 2;
 
-            if (arr[mid].equals(target)) {
-                result = mid;
-                low = mid + 1; // go right
-            } else if (arr[mid].compareTo(target) < 0) {
-                low = mid + 1;
-            } else {
+            if (arr[mid] == target) return arr[mid];
+
+            if (arr[mid] > target) {
+                ceil = arr[mid]; // possible answer
                 high = mid - 1;
+            } else {
+                low = mid + 1;
             }
         }
 
-        return result;
+        return ceil;
     }
 
-    // Counter class for tracking comparisons
+    // ---------------- INSERTION POINT (LOWER BOUND) ----------------
+    public static int insertionPoint(int[] arr, int target) {
+        int low = 0, high = arr.length;
+
+        while (low < high) {
+            int mid = (low + high) / 2;
+
+            if (arr[mid] < target) {
+                low = mid + 1;
+            } else {
+                high = mid;
+            }
+        }
+
+        return low; // position where element should be inserted
+    }
+
+    // Counter class
     static class Counter {
         int count = 0;
     }
@@ -78,30 +92,23 @@ public class ProblemStatement {
     // ---------------- MAIN ----------------
     public static void main(String[] args) {
 
-        String[] logs = {"accA", "accB", "accB", "accC"};
+        int[] risks = {10, 25, 50, 100};
+        int target = 30;
 
-        String target = "accB";
+        // Linear search (unsorted case)
+        linearSearch(risks, target);
 
-        // Linear Search
-        linearSearch(logs, target);
-
-        // Binary Search (requires sorted input)
-        Arrays.sort(logs);
-
+        // Binary search operations
         Counter counter = new Counter();
 
-        int first = binaryFirst(logs, target, counter);
-        int last = binaryLast(logs, target, counter);
+        int floor = findFloor(risks, target, counter);
+        int ceiling = findCeiling(risks, target, counter);
+        int insertPos = insertionPoint(risks, target);
 
         System.out.println("\nBinary Search:");
-        if (first != -1) {
-            System.out.println("First occurrence: " + first);
-            System.out.println("Last occurrence: " + last);
-            System.out.println("Count: " + (last - first + 1));
-        } else {
-            System.out.println("Not found");
-        }
-
+        System.out.println("Floor(" + target + "): " + floor);
+        System.out.println("Ceiling(" + target + "): " + ceiling);
+        System.out.println("Insertion Point: index " + insertPos);
         System.out.println("Comparisons: " + counter.count);
     }
 }
